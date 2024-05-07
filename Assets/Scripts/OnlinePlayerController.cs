@@ -6,6 +6,7 @@ using UnityEngine;
 public class OnlinePlayerController : NetworkBehaviour
 {
     public float Speed = 10.0f;
+    public NetworkObject PrefabToSpawn;
 
     public NetworkVariable<float> positionX = new();
 
@@ -37,6 +38,20 @@ public class OnlinePlayerController : NetworkBehaviour
         {
             Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical")).normalized;
             transform.position += direction * Speed * Time.deltaTime;
+
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                SpawnObjectServerRpc();
+            }
         }
+    }
+
+    [ServerRpc]
+    private void SpawnObjectServerRpc()
+    {
+        float distance = 5.0f;
+        Vector3 spawnPosition = transform.position + transform.forward * distance;
+        NetworkObject spawnedObject = Instantiate(PrefabToSpawn, spawnPosition, Quaternion.identity);
+        spawnedObject.Spawn();
     }
 } 
